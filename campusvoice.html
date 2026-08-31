@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusVoice — Student Feedback and College Response Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F5F1;
+    --surface:#FFFFFF;
+    --surface-2:#ECEFE9;
+    --ink:#1C2420;
+    --ink-soft:#57635B;
+    --ink-faint:#8B968E;
+    --teal:#1F6F63;
+    --teal-deep:#123B34;
+    --teal-tint:#E3EFEC;
+    --amber:#C97A2B;
+    --amber-tint:#F7EADA;
+    --rose:#AE4A3C;
+    --rose-tint:#F5E5E1;
+    --line:#D9DFD7;
+    --line-strong:#B9C2B7;
+    --radius:2px;
+    --serif: "Source Serif 4", serif;
+    --sans: "IBM Plex Sans", sans-serif;
+    --mono: "IBM Plex Mono", monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--teal); color:#fff;}
+  :focus-visible{outline:2px solid var(--teal); outline-offset:2px;}
+
+  h1,h2,h3,h4{font-family:var(--serif); margin:0; font-weight:600; color:var(--teal-deep); letter-spacing:-0.01em;}
+  p{margin:0;}
+
+  .wrap{max-width:1120px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* ---------- NAV ---------- */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:rgba(243,245,241,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; height:68px;}
+  .logo{display:flex; align-items:baseline; gap:8px; cursor:pointer; background:none; border:none; font:inherit;}
+  .logo .mark{width:9px; height:9px; background:var(--teal); display:inline-block; border-radius:50%; transform:translateY(-1px);}
+  .logo-text{font-family:var(--serif); font-weight:600; font-size:1.28rem; color:var(--teal-deep);}
+  nav.links{display:flex; gap:2px; align-items:center;}
+  nav.links button{
+    font-family:var(--sans); font-size:0.92rem; color:var(--ink-soft); background:none; border:none;
+    padding:9px 14px; cursor:pointer; border-radius:var(--radius); transition:color .15s, background .15s;
+  }
+  nav.links button:hover{color:var(--ink); background:var(--surface-2);}
+  nav.links button.active{color:var(--teal-deep); font-weight:600;}
+  .nav-cta{
+    background:var(--teal); color:#fff !important; padding:9px 18px !important; margin-left:8px;
+    border-radius:var(--radius) !important;
+  }
+  .nav-cta:hover{background:var(--teal-deep) !important;}
+  @media (max-width:860px){ nav.links .hide-mobile{display:none;} }
+
+  /* ---------- VIEWS ---------- */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- HERO ---------- */
+  section.hero{padding:88px 0 76px; border-bottom:1px solid var(--line);}
+  .hero-grid{display:grid; grid-template-columns:1.05fr 0.95fr; gap:64px; align-items:center;}
+  @media (max-width:920px){ .hero-grid{grid-template-columns:1fr; gap:48px;} }
+  .eyebrow-line{display:flex; align-items:center; gap:10px; margin-bottom:22px; color:var(--ink-faint); font-size:0.86rem;}
+  .eyebrow-line .rule{width:28px; height:1px; background:var(--line-strong);}
+  .hero h1{font-size:2.55rem; line-height:1.16; max-width:15ch;}
+  @media (max-width:640px){ .hero h1{font-size:2rem;} }
+  .hero .lede{margin-top:22px; font-size:1.08rem; color:var(--ink-soft); max-width:46ch;}
+  .hero-actions{margin-top:32px; display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--sans); font-size:0.95rem; font-weight:600; padding:13px 22px; border-radius:var(--radius);
+    border:1px solid transparent; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-deep);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line-strong);}
+  .btn-ghost:hover{border-color:var(--teal); color:var(--teal-deep);}
+
+  .stat-row{display:flex; gap:36px; margin-top:44px; flex-wrap:wrap;}
+  .stat-row .stat b{display:block; font-family:var(--serif); font-size:1.7rem; color:var(--teal-deep);}
+  .stat-row .stat span{font-size:0.82rem; color:var(--ink-faint);}
+
+  /* Signature element: the chain card */
+  .chain-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px 26px 22px; box-shadow:0 1px 0 var(--line);
+  }
+  .chain-card .chain-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
+  .chain-card .chain-head h4{font-size:0.98rem;}
+  .chain-card .tag-id{font-family:var(--mono); font-size:0.78rem; color:var(--ink-faint);}
+  .chain-card .chain-sub{font-size:0.85rem; color:var(--ink-soft); margin-bottom:20px;}
+  .chain{list-style:none; margin:0; padding:0; position:relative;}
+  .chain li{
+    display:flex; gap:14px; padding-bottom:20px; position:relative; opacity:0; transform:translateY(6px);
+    animation:chainIn .5s ease forwards;
+  }
+  .chain li:last-child{padding-bottom:0;}
+  .chain li .dot-col{display:flex; flex-direction:column; align-items:center;}
+  .chain li .dot{width:11px; height:11px; border-radius:50%; background:var(--line-strong); flex:none; margin-top:2px;}
+  .chain li.done .dot{background:var(--teal);}
+  .chain li.current .dot{background:var(--amber); box-shadow:0 0 0 4px var(--amber-tint);}
+  .chain li .stem{width:1px; flex:1; background:var(--line); margin-top:2px;}
+  .chain li.done .stem{background:var(--teal);}
+  .chain li .body{padding-top:0;}
+  .chain li .label{font-size:0.9rem; font-weight:600; color:var(--ink);}
+  .chain li.done .label{color:var(--teal-deep);}
+  .chain li .meta{font-size:0.78rem; color:var(--ink-faint); margin-top:2px;}
+  @keyframes chainIn{to{opacity:1; transform:translateY(0);}}
+
+  /* ---------- SECTION GENERIC ---------- */
+  section.block{padding:72px 0; border-bottom:1px solid var(--line);}
+  section.block.tight{padding:56px 0;}
+  .section-head{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:40px;}
+  .section-head h2{font-size:1.65rem; max-width:26ch;}
+  .section-head p.section-dek{color:var(--ink-soft); max-width:38ch; font-size:0.95rem;}
+  @media (max-width:760px){ .section-head{flex-direction:column; align-items:flex-start;} }
+
+  /* ledger rows (used instead of generic cards where it's a listing) */
+  .ledger{border-top:1px solid var(--line);}
+  .ledger-row{
+    display:grid; grid-template-columns:40px 1.3fr 1.7fr; gap:24px; padding:22px 0; border-bottom:1px solid var(--line);
+  }
+  @media (max-width:760px){ .ledger-row{grid-template-columns:32px 1fr; } .ledger-row > div:nth-child(3){grid-column:1/-1;} }
+  .ledger-row .idx{font-family:var(--mono); color:var(--ink-faint); font-size:0.85rem; padding-top:2px;}
+  .ledger-row h3{font-size:1.05rem;}
+  .ledger-row .desc{color:var(--ink-soft); font-size:0.92rem;}
+
+  /* feature grid (not identical cards — asymmetric two-col list w/ rule dividers) */
+  .feature-list{display:grid; grid-template-columns:1fr 1fr; gap:0 48px;}
+  @media (max-width:760px){ .feature-list{grid-template-columns:1fr;} }
+  .feature-item{padding:20px 0; border-top:1px solid var(--line);}
+  .feature-item h4{font-size:1rem; margin-bottom:6px;}
+  .feature-item p{font-size:0.9rem; color:var(--ink-soft);}
+
+  /* pills */
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; font-size:0.76rem; font-weight:600; padding:4px 10px;
+    border-radius:20px; letter-spacing:0.01em;
+  }
+  .pill .dot{width:6px; height:6px; border-radius:50%;}
+  .pill.st-submitted{background:var(--surface-2); color:var(--ink-soft);} .pill.st-submitted .dot{background:var(--ink-faint);}
+  .pill.st-progress{background:var(--amber-tint); color:#8a5a1f;} .pill.st-progress .dot{background:var(--amber);}
+  .pill.st-review{background:#EAE7F4; color:#5B4E9C;} .pill.st-review .dot{background:#7B6BC7;}
+  .pill.st-verify{background:var(--teal-tint); color:var(--teal-deep);} .pill.st-verify .dot{background:var(--teal);}
+  .pill.st-closed{background:#E3E9E2; color:#3E4A3F;} .pill.st-closed .dot{background:#5B6B5C;}
+  .pill.st-reopen{background:var(--rose-tint); color:#7C3223;} .pill.st-reopen .dot{background:var(--rose);}
+
+  .urgency{font-family:var(--mono); font-size:0.72rem; padding:2px 6px; border:1px solid var(--line-strong); color:var(--ink-soft);}
+  .urgency.high{border-color:var(--rose); color:var(--rose);}
+
+  /* footer */
+  footer{padding:48px 0 60px;}
+  .footer-grid{display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;}
+  footer .promise{max-width:38ch; color:var(--ink-soft); font-size:0.9rem;}
+  footer .cols{display:flex; gap:56px; flex-wrap:wrap;}
+  footer .col h5{font-size:0.82rem; color:var(--ink-faint); margin-bottom:10px; font-weight:600;}
+  footer .col a{display:block; font-size:0.88rem; color:var(--ink-soft); text-decoration:none; margin-bottom:8px; cursor:pointer;}
+  footer .col a:hover{color:var(--teal-deep);}
+  .fine{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); font-size:0.8rem; color:var(--ink-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+
+  /* ---------- PAGE HEADER (non-home views) ---------- */
+  .page-header{padding:52px 0 36px; border-bottom:1px solid var(--line);}
+  .page-header .kicker{font-size:0.82rem; color:var(--teal); font-weight:600; margin-bottom:10px;}
+  .page-header h1{font-size:2rem;}
+  .page-header p{color:var(--ink-soft); margin-top:12px; max-width:56ch;}
+
+  /* ---------- FORM (Submit view) ---------- */
+  .form-shell{padding:48px 0 80px;}
+  .form-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:56px;}
+  @media (max-width:900px){ .form-grid{grid-template-columns:1fr;} }
+  .field{margin-bottom:24px;}
+  .field label{display:block; font-size:0.86rem; font-weight:600; margin-bottom:8px; color:var(--ink);}
+  .field .hint{font-size:0.8rem; color:var(--ink-faint); margin-top:6px;}
+  .field input[type=text], .field textarea, .field select{
+    width:100%; font-family:var(--sans); font-size:0.95rem; padding:12px 14px; border:1px solid var(--line-strong);
+    border-radius:var(--radius); background:var(--surface); color:var(--ink);
+  }
+  .field textarea{min-height:120px; resize:vertical;}
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--teal);}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{
+    padding:9px 14px; border:1px solid var(--line-strong); border-radius:20px; font-size:0.86rem; cursor:pointer;
+    background:var(--surface); color:var(--ink-soft); transition:all .12s;
+  }
+  .chip.selected{background:var(--teal); border-color:var(--teal); color:#fff;}
+  .privacy-opt{
+    border:1px solid var(--line-strong); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px; cursor:pointer;
+  }
+  .privacy-opt.selected{border-color:var(--teal); background:var(--teal-tint);}
+  .privacy-opt b{font-size:0.9rem; display:block;}
+  .privacy-opt span{font-size:0.82rem; color:var(--ink-soft);}
+
+  .side-note{background:var(--surface); border:1px solid var(--line); padding:22px; border-radius:var(--radius); margin-bottom:20px;}
+  .side-note h4{font-size:0.95rem; margin-bottom:10px;}
+  .side-note p{font-size:0.86rem; color:var(--ink-soft); margin-bottom:8px;}
+  .dup-card{border:1px solid var(--line); padding:12px 14px; margin-top:10px; background:var(--bg); font-size:0.85rem;}
+  .dup-card b{display:block; font-size:0.87rem;}
+  .dup-card .support-btn{margin-top:8px; font-size:0.78rem; padding:5px 10px; background:none; border:1px solid var(--line-strong); cursor:pointer; border-radius:var(--radius);}
+
+  .submit-confirm{display:none; text-align:center; padding:80px 0;}
+  .submit-confirm.active{display:block;}
+  .submit-confirm .idbox{font-family:var(--mono); font-size:1.3rem; background:var(--teal-tint); color:var(--teal-deep); padding:12px 24px; display:inline-block; border-radius:var(--radius); margin:20px 0;}
+
+  /* ---------- BOARD ---------- */
+  .board-controls{display:flex; gap:12px; flex-wrap:wrap; padding:28px 0; border-bottom:1px solid var(--line);}
+  .board-controls select, .board-controls input{
+    font-family:var(--sans); font-size:0.86rem; padding:9px 12px; border:1px solid var(--line-strong); border-radius:var(--radius); background:var(--surface);
+  }
+  .issue-row{
+    display:grid; grid-template-columns:1fr auto; gap:16px; padding:22px 0; border-bottom:1px solid var(--line); cursor:pointer;
+  }
+  .issue-row:hover .issue-title{color:var(--teal-deep);}
+  .issue-title{font-family:var(--serif); font-weight:600; font-size:1.08rem; margin-bottom:6px;}
+  .issue-meta{font-size:0.82rem; color:var(--ink-faint); display:flex; gap:14px; flex-wrap:wrap;}
+  .issue-right{text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+  .support-count{font-family:var(--mono); font-size:0.85rem; color:var(--ink-soft);}
+
+  /* ---------- DETAIL MODAL ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(20,26,22,0.5); display:none; align-items:flex-start; justify-content:center;
+    padding:48px 20px; overflow-y:auto; z-index:100;
+  }
+  .modal-backdrop.active{display:flex;}
+  .modal{background:var(--surface); max-width:680px; width:100%; border-radius:var(--radius); padding:36px 40px 40px; position:relative;}
+  .modal-close{position:absolute; top:20px; right:22px; background:none; border:none; font-size:1.3rem; cursor:pointer; color:var(--ink-faint);}
+  .modal h2{font-size:1.4rem; margin-bottom:6px;}
+  .modal .modal-meta{font-size:0.85rem; color:var(--ink-faint); margin-bottom:20px;}
+  .modal .modal-desc{font-size:0.94rem; color:var(--ink-soft); margin-bottom:26px; padding-bottom:26px; border-bottom:1px solid var(--line);}
+  .timeline{list-style:none; margin:0; padding:0;}
+  .timeline li{display:grid; grid-template-columns:16px 1fr; gap:14px; padding-bottom:18px;}
+  .timeline li .tdot{width:8px; height:8px; border-radius:50%; background:var(--teal); margin-top:5px;}
+  .timeline li .twhen{font-family:var(--mono); font-size:0.74rem; color:var(--ink-faint);}
+  .timeline li .twhat{font-size:0.9rem; margin-top:2px;}
+  .verify-row{display:flex; gap:10px; margin-top:24px; flex-wrap:wrap;}
+  .verify-row button{
+    font-size:0.84rem; padding:9px 15px; border-radius:var(--radius); border:1px solid var(--line-strong); background:var(--surface); cursor:pointer;
+  }
+  .verify-row button:hover{border-color:var(--teal); color:var(--teal-deep);}
+
+  /* ---------- DASHBOARD ---------- */
+  .dash-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:48px;}
+  .dash-stat{background:var(--surface); padding:24px 22px;}
+  .dash-stat .num{font-family:var(--serif); font-size:1.9rem; color:var(--teal-deep);}
+  .dash-stat .lab{font-size:0.8rem; color:var(--ink-faint); margin-top:4px;}
+  @media (max-width:760px){ .dash-grid{grid-template-columns:repeat(2,1fr);} }
+
+  .bar-list{margin-bottom:8px;}
+  .bar-row{display:grid; grid-template-columns:150px 1fr 40px; align-items:center; gap:14px; padding:9px 0;}
+  .bar-row .bl-label{font-size:0.86rem; color:var(--ink-soft);}
+  .bar-track{background:var(--surface-2); height:9px; border-radius:5px; overflow:hidden;}
+  .bar-fill{background:var(--teal); height:100%; border-radius:5px;}
+  .bar-row .bl-val{font-family:var(--mono); font-size:0.78rem; color:var(--ink-faint); text-align:right;}
+
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:56px;}
+  @media (max-width:860px){ .two-col{grid-template-columns:1fr;} }
+
+  /* transparency "you said we did" */
+  .said-did{border:1px solid var(--line); padding:22px 24px; margin-bottom:16px; background:var(--surface);}
+  .said-did .said{font-size:0.85rem; color:var(--ink-faint); margin-bottom:6px;}
+  .said-did .said b{color:var(--ink-soft); font-weight:600;}
+  .said-did .did{font-size:0.95rem;}
+
+  .toast{
+    position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--teal-deep); color:#fff;
+    padding:12px 22px; border-radius:var(--radius); font-size:0.88rem; opacity:0; transition:all .25s; z-index:200; pointer-events:none;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav-inner">
+    <button class="logo" onclick="go('home')">
+      <span class="mark"></span><span class="logo-text">CampusVoice</span>
+    </button>
+    <nav class="links">
+      <button data-view="home" onclick="go('home')">Home</button>
+      <button data-view="submit" onclick="go('submit')">Submit feedback</button>
+      <button data-view="board" onclick="go('board')" class="hide-mobile">Issue board</button>
+      <button data-view="dashboard" onclick="go('dashboard')" class="hide-mobile">Dashboards</button>
+      <button data-view="transparency" onclick="go('transparency')" class="hide-mobile">Transparency</button>
+      <button class="nav-cta" onclick="go('submit')">+ New report</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HOME ============ -->
+<main id="view-home" class="view active">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow-line"><span class="rule"></span>Verified reporting, for every department on campus</div>
+        <h1>No feedback is complete until it's answered — and you can confirm the fix.</h1>
+        <p class="lede">CampusVoice turns scattered complaints and suggestions into tracked cases with an owner, a deadline, a response, and proof — so students can see exactly what happened after they spoke up.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" onclick="go('submit')">Report an issue</button>
+          <button class="btn btn-ghost" onclick="go('board')">See open issues</button>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><b>412</b><span>Issues resolved this term</span></div>
+          <div class="stat"><b>6.2 days</b><span>Average response time</span></div>
+          <div class="stat"><b>89%</b><span>Verified as solved by students</span></div>
+        </div>
+      </div>
+      <div class="chain-card">
+        <div class="chain-head"><h4>Broken projector — Lab 3</h4><span class="tag-id">CV-2291</span></div>
+        <div class="chain-sub">Submitted by a student · identity protected · Facilities</div>
+        <ul class="chain" id="heroChain"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>One report, eight checkpoints, zero disappearing acts</h2>
+          <p class="section-dek">Every submission moves through the same accountable sequence — nothing gets marked done without evidence and a student sign-off.</p>
+        </div>
+      </div>
+      <div class="ledger">
+        <div class="ledger-row"><div class="idx">01</div><div><h3>Student submits</h3></div><div class="desc">Category, department, location, urgency, evidence, and a privacy level are set at the start — public, anonymous, or confidential to a grievance officer.</div></div>
+        <div class="ledger-row"><div class="idx">02</div><div><h3>System checks it</h3></div><div class="desc">Automated checks catch spam, duplicates, and missing detail; a human reviews anything sensitive before it moves forward.</div></div>
+        <div class="ledger-row"><div class="idx">03</div><div><h3>College verifies & assigns</h3></div><div class="desc">A staff member confirms the issue is genuine, assigns an owner, sets a target date, and issues a tracking number.</div></div>
+        <div class="ledger-row"><div class="idx">04</div><div><h3>Department investigates</div></h3><div class="desc">Internal notes, follow-up questions, and a public timeline update — sensitive cases move to a restricted workflow.</div></div>
+        <div class="ledger-row"><div class="idx">05</div><div><h3>College responds</h3></div><div class="desc">What will be done, what won't, and why — a bare "noted" is never treated as a resolution.</div></div>
+        <div class="ledger-row"><div class="idx">06</div><div><h3>Action is taken</h3></div><div class="desc">The owner uploads evidence of progress or completion; dates and changes are recorded so history can't be rewritten.</div></div>
+        <div class="ledger-row"><div class="idx">07</div><div><h3>Students verify</h3></div><div class="desc">Affected students mark the outcome solved, partially solved, or not solved, with a short note.</div></div>
+        <div class="ledger-row"><div class="idx">08</div><div><h3>Closed — or reopened</h3></div><div class="desc">Confirmed fixes close and roll into performance reports. Rejected fixes reopen automatically and escalate.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block tight">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2>Built so criticism doesn't cost you anything</h2>
+          <p class="section-dek">Protections for students and departments, on both sides of every case.</p>
+        </div>
+      </div>
+      <div class="feature-list">
+        <div class="feature-item"><h4>Anonymous, not secret</h4><p>Choose public, anonymous-to-peers, or confidential-to-an-officer — the form is upfront about what each level actually protects.</p></div>
+        <div class="feature-item"><h4>Explainable priority</h4><p>Priority scores show their inputs — affected students, urgency, safety risk, time unresolved — never an unexplained number.</p></div>
+        <div class="feature-item"><h4>Reasons for "no"</h4><p>A rejected or postponed request comes with a stated reason: budget, policy, safety, duplication, or planned future work.</p></div>
+        <div class="feature-item"><h4>Verification quorum</h4><p>Several affected students can reject a marked-complete fix and send it straight back to the department.</p></div>
+        <div class="feature-item"><h4>Duplicate detection</h4><p>Typing a complaint surfaces similar open issues first, so support consolidates instead of splintering.</p></div>
+        <div class="feature-item"><h4>Recognition, not just complaints</h4><p>Students can credit a helpful teacher, a fixed facility, or a well-run event — feedback isn't only ever critical.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block tight">
+    <div class="wrap two-col">
+      <div>
+        <h2 style="font-size:1.4rem; margin-bottom:16px;">Recent activity</h2>
+        <div id="homeRecent"></div>
+      </div>
+      <div>
+        <h2 style="font-size:1.4rem; margin-bottom:16px;">This term, by category</h2>
+        <div class="bar-list" id="homeBars"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ SUBMIT ============ -->
+<main id="view-submit" class="view">
+  <div class="page-header wrap">
+    <div class="kicker">Submit feedback</div>
+    <h1>Tell us what's going on</h1>
+    <p>Typical response: a staff member reviews new reports within 3 working days. Urgent and safety-related reports are prioritized immediately.</p>
+  </div>
+
+  <div class="form-shell wrap">
+    <div id="formStage">
+      <div class="form-grid">
+        <div>
+          <div class="field">
+            <label for="f-title">Title</label>
+            <input type="text" id="f-title" placeholder="e.g. Projector not working in Lab 3" oninput="checkDuplicates()">
+          </div>
+          <div class="field">
+            <label>Category</label>
+            <div class="chip-row" id="categoryChips"></div>
+          </div>
+          <div class="field">
+            <label for="f-dept">Department</label>
+            <select id="f-dept">
+              <option>Facilities</option><option>Academics</option><option>Examinations</option>
+              <option>Library</option><option>Hostel</option><option>Transport</option>
+              <option>Food Services</option><option>Placements</option><option>Student Affairs</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-desc">Description</label>
+            <textarea id="f-desc" placeholder="What happened, where, and since when?"></textarea>
+          </div>
+          <div class="field">
+            <label>Urgency</label>
+            <div class="chip-row" id="urgencyChips"></div>
+          </div>
+          <div class="field">
+            <label>Privacy level</label>
+            <div class="privacy-opt selected" data-priv="public" onclick="selectPrivacy(this)"><b>Public</b><span>Visible to all students and staff with your name attached.</span></div>
+            <div class="privacy-opt" data-priv="anon" onclick="selectPrivacy(this)"><b>Anonymous to students</b><span>Other students won't see who submitted it; authorized administrators can.</span></div>
+            <div class="privacy-opt" data-priv="confidential" onclick="selectPrivacy(this)"><b>Confidential</b><span>Visible only to a designated grievance officer. Not fully secret — but tightly restricted.</span></div>
+            <p class="hint">Anonymity limits who can see your identity. It never means no record exists at all.</p>
+          </div>
+          <button class="btn btn-primary" onclick="submitFeedback()">Submit report</button>
+        </div>
+
+        <div>
+          <div class="side-note">
+            <h4>Similar issues already open</h4>
+            <p>Start typing a title — we'll check for existing reports so common problems stay consolidated.</p>
+            <div id="dupResults"></div>
+          </div>
+          <div class="side-note">
+            <h4>What happens next</h4>
+            <p>1. A staff member verifies and assigns it a tracking number.</p>
+            <p>2. The responsible department sets a target date and an owner.</p>
+            <p>3. You're notified at each status change and asked to confirm any fix.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="submitConfirm" class="submit-confirm">
+      <h2 style="font-size:1.6rem;">Report received</h2>
+      <p style="color:var(--ink-soft); margin-top:10px;">Your tracking number is</p>
+      <div class="idbox" id="confirmId"></div>
+      <p style="color:var(--ink-soft);">A staff member typically reviews new reports within 3 working days.</p>
+      <div style="margin-top:28px; display:flex; gap:12px; justify-content:center;">
+        <button class="btn btn-ghost" onclick="go('board')">View issue board</button>
+        <button class="btn btn-primary" onclick="resetForm()">Submit another</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ BOARD ============ -->
+<main id="view-board" class="view">
+  <div class="page-header wrap">
+    <div class="kicker">Campus issue board</div>
+    <h1>Open and recently closed issues</h1>
+    <p>Public information only — personal details and confidential cases are never shown here.</p>
+  </div>
+  <div class="wrap">
+    <div class="board-controls">
+      <select id="filterCategory" onchange="renderBoard()"><option value="">All categories</option></select>
+      <select id="filterStatus" onchange="renderBoard()">
+        <option value="">All statuses</option>
+        <option value="submitted">Submitted</option>
+        <option value="progress">In progress</option>
+        <option value="review">Under review</option>
+        <option value="verify">Awaiting verification</option>
+        <option value="closed">Closed</option>
+        <option value="reopen">Reopened</option>
+      </select>
+      <input type="text" id="filterText" placeholder="Search issues…" oninput="renderBoard()">
+    </div>
+    <div id="boardList"></div>
+  </div>
+</main>
+
+<!-- ============ DASHBOARD ============ -->
+<main id="view-dashboard" class="view">
+  <div class="page-header wrap">
+    <div class="kicker">Department dashboard</div>
+    <h1>Facilities — this term</h1>
+    <p>Staff view. Students see a simplified, public version of this on the Transparency page.</p>
+  </div>
+  <div class="wrap" style="padding-top:44px;">
+    <div class="dash-grid">
+      <div class="dash-stat"><div class="num">58</div><div class="lab">New issues</div></div>
+      <div class="dash-stat"><div class="num">11</div><div class="lab">Unresolved</div></div>
+      <div class="dash-stat"><div class="num">3</div><div class="lab">Overdue actions</div></div>
+      <div class="dash-stat"><div class="num">6.2d</div><div class="lab">Avg. response time</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <h2 style="font-size:1.3rem; margin-bottom:18px;">Recurring problems</h2>
+        <div class="bar-list" id="dashBars1"></div>
+      </div>
+      <div>
+        <h2 style="font-size:1.3rem; margin-bottom:18px;">Satisfaction after resolution</h2>
+        <div class="bar-list" id="dashBars2"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============ TRANSPARENCY ============ -->
+<main id="view-transparency" class="view">
+  <div class="page-header wrap">
+    <div class="kicker">Transparency report</div>
+    <h1>You said, we did</h1>
+    <p>Aggregated, campus-wide progress — updated every term.</p>
+  </div>
+  <div class="wrap" style="padding-top:44px;">
+    <div class="dash-grid">
+      <div class="dash-stat"><div class="num">1,204</div><div class="lab">Issues received</div></div>
+      <div class="dash-stat"><div class="num">1,058</div><div class="lab">Issues resolved</div></div>
+      <div class="dash-stat"><div class="num">89%</div><div class="lab">Confirmed solved by students</div></div>
+      <div class="dash-stat"><div class="num">4</div><div class="lab">Active improvement projects</div></div>
+    </div>
+    <h2 style="font-size:1.3rem; margin-bottom:18px;">This term's outcomes</h2>
+    <div id="saidDidList"></div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="promise">
+        <div class="logo" style="margin-bottom:14px; cursor:default;"><span class="mark"></span><span class="logo-text">CampusVoice</span></div>
+        <p class="section-dek" style="max-width:none;">No important feedback is considered complete until the responsible department responds and affected students can verify the outcome.</p>
+      </div>
+      <div class="cols">
+        <div class="col">
+          <h5>Platform</h5>
+          <a onclick="go('submit')">Submit feedback</a>
+          <a onclick="go('board')">Issue board</a>
+          <a onclick="go('transparency')">Transparency report</a>
+        </div>
+        <div class="col">
+          <h5>Support</h5>
+          <a onclick="go('submit')">Confidential reporting</a>
+          <a href="#">Grievance officers</a>
+          <a href="#">Accessibility mode</a>
+        </div>
+      </div>
+    </div>
+    <div class="fine">
+      <span>CampusVoice — a student feedback and college response platform</span>
+      <span>Prototype build for demonstration</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------------- Data ---------------- */
+const CATEGORIES = ["Academics","Teaching Quality","Examinations","Timetable","Library","Hostel","Transport","Food Services","Campus Facilities","Fees","Placements","Events","Safety","Accessibility","Mental Health Support"];
+const URGENCIES = ["Low","Medium","High","Safety-critical"];
+
+const STATUS_META = {
+  submitted:{label:"Submitted", cls:"st-submitted"},
+  progress:{label:"In progress", cls:"st-progress"},
+  review:{label:"Under review", cls:"st-review"},
+  verify:{label:"Awaiting verification", cls:"st-verify"},
+  closed:{label:"Closed", cls:"st-closed"},
+  reopen:{label:"Reopened", cls:"st-reopen"}
+};
+
+let ISSUES = [
+  {id:"CV-2291", title:"Broken projector in Lab 3", category:"Campus Facilities", dept:"Facilities", status:"verify", urgency:"Medium", support:34, desc:"Projector has not worked for three weeks, affecting three sections of the afternoon lab batch.",
+   timeline:[
+     ["Aug 3","Submitted by a student, evidence attached (photo)."],
+     ["Aug 4","Verified by Facilities coordinator. Tracking number issued."],
+     ["Aug 6","Assigned to technician R. Iyer. Target date set: Aug 20."],
+     ["Aug 15","Update: replacement part ordered from vendor."],
+     ["Aug 22","Installed. Completion photo uploaded. Awaiting student verification."]
+   ]},
+  {id:"CV-2214", title:"Exam timetable clashes for elective students", category:"Examinations", dept:"Examinations", status:"progress", urgency:"High", support:87, desc:"Two electives were scheduled in the same slot, affecting roughly 40 students.",
+   timeline:[
+     ["Jul 28","Submitted, 12 students supporting within a day."],
+     ["Jul 29","Verified and escalated — flagged as affecting many students."],
+     ["Aug 2","Examinations office confirms revised timetable in progress."]
+   ]},
+  {id:"CV-2180", title:"Hostel water heater not working — Block C", category:"Hostel", dept:"Hostel", status:"reopen", urgency:"Medium", support:21, desc:"Marked complete on Jul 10 but heater failed again within a week.",
+   timeline:[
+     ["Jul 2","Submitted."],
+     ["Jul 10","Marked completed with repair evidence."],
+     ["Jul 11","4 students marked 'not solved'. Case reopened automatically."],
+     ["Jul 14","Escalated to Hostel warden for a permanent fix."]
+   ]},
+  {id:"CV-2299", title:"Library extended hours during exam week — appreciation", category:"Library", dept:"Library", status:"closed", urgency:"Low", support:56, desc:"Students recognizing the library's extended hours during finals week.",
+   timeline:[["Aug 10","Submitted as appreciation."],["Aug 11","Shared with Library staff and closed."]]},
+  {id:"CV-2244", title:"Canteen menu lacks options for students with allergies", category:"Food Services", dept:"Food Services", status:"review", urgency:"Medium", support:29,
+   desc:"Multiple students report no labelled allergen information on canteen counters.",
+   timeline:[["Aug 12","Submitted."],["Aug 14","Under review by Food Services coordinator."]]},
+  {id:"CV-2255", title:"Wheelchair ramp at Block D needs repair", category:"Accessibility", dept:"Facilities", status:"progress", urgency:"Safety-critical", support:19,
+   desc:"Ramp surface has cracked, reported as a fall risk by a student using a wheelchair.",
+   timeline:[["Aug 18","Submitted, flagged safety-critical, auto-escalated."],["Aug 19","Facilities confirms inspection scheduled within 48 hours."]]},
+  {id:"CV-2170", title:"Placement cell response time on queries", category:"Placements", dept:"Placements", status:"closed", urgency:"Low", support:41,
+   desc:"Students requested faster acknowledgement of placement-related emails.",
+   timeline:[["Jun 20","Submitted."],["Jun 28","Placement cell introduces a 48-hour acknowledgement SLA."],["Jul 5","Students confirm improvement. Closed."]]},
+  {id:"CV-2301", title:"Late-night shuttle route skips North Gate", category:"Transport", dept:"Transport", status:"submitted", urgency:"Medium", support:12,
+   desc:"Students living near North Gate say the 9pm shuttle no longer stops there.",
+   timeline:[["Aug 24","Submitted, pending verification."]]}
+];
+
+let selectedCategory = CATEGORIES[8]; // Campus Facilities default
+let selectedUrgency = URGENCIES[1];
+let selectedPrivacy = "public";
+let counter = 2302;
+
+/* ---------------- Routing ---------------- */
+function go(view){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-"+view).classList.add("active");
+  document.querySelectorAll("nav.links button[data-view]").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
+  window.scrollTo({top:0, behavior:"instant"});
+  if(view==="board") renderBoard();
+  if(view==="dashboard") renderDashboard();
+  if(view==="transparency") renderTransparency();
+}
+
+/* ---------------- Hero chain ---------------- */
+function renderHeroChain(){
+  const steps = [
+    {label:"Submitted", done:true},
+    {label:"Verified & assigned", done:true},
+    {label:"In progress — part ordered", done:true},
+    {label:"Completion evidence uploaded", done:true},
+    {label:"Awaiting student verification", current:true},
+    {label:"Closed", done:false}
+  ];
+  const el = document.getElementById("heroChain");
+  el.innerHTML = steps.map((s,i)=>`
+    <li class="${s.done?'done':''} ${s.current?'current':''}" style="animation-delay:${i*0.09}s">
+      <div class="dot-col"><div class="dot"></div>${i<steps.length-1?'<div class="stem"></div>':''}</div>
+      <div class="body"><div class="label">${s.label}</div>${s.current?'<div class="meta">Students testing the fix now</div>':''}</div>
+    </li>`).join("");
+}
+
+/* ---------------- Home widgets ---------------- */
+function renderHomeRecent(){
+  const recent = ISSUES.slice(0,4);
+  document.getElementById("homeRecent").innerHTML = recent.map(i=>`
+    <div class="issue-row" onclick="openIssue('${i.id}')" style="border-bottom:1px solid var(--line); padding:16px 0; cursor:pointer;">
+      <div>
+        <div class="issue-title" style="font-size:0.98rem;">${i.title}</div>
+        <div class="issue-meta"><span>${i.category}</span><span>${i.id}</span></div>
+      </div>
+      <div><span class="pill ${STATUS_META[i.status].cls}"><span class="dot"></span>${STATUS_META[i.status].label}</span></div>
+    </div>`).join("");
+}
+function renderHomeBars(){
+  const counts = {};
+  ISSUES.forEach(i=>counts[i.category]=(counts[i.category]||0)+1);
+  const max = Math.max(...Object.values(counts));
+  const rows = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  document.getElementById("homeBars").innerHTML = rows.map(([cat,n])=>`
+    <div class="bar-row"><div class="bl-label">${cat}</div><div class="bar-track"><div class="bar-fill" style="width:${(n/max*100).toFixed(0)}%"></div></div><div class="bl-val">${n}</div></div>
+  `).join("");
+}
+
+/* ---------------- Submit form ---------------- */
+function renderChips(){
+  document.getElementById("categoryChips").innerHTML = CATEGORIES.map(c=>
+    `<div class="chip ${c===selectedCategory?'selected':''}" onclick="pickCategory(this,'${c}')">${c}</div>`).join("");
+  document.getElementById("urgencyChips").innerHTML = URGENCIES.map(u=>
+    `<div class="chip ${u===selectedUrgency?'selected':''}" onclick="pickUrgency(this,'${u}')">${u}</div>`).join("");
+}
+function pickCategory(el,c){ selectedCategory=c; document.querySelectorAll("#categoryChips .chip").forEach(x=>x.classList.remove("selected")); el.classList.add("selected"); }
+function pickUrgency(el,u){ selectedUrgency=u; document.querySelectorAll("#urgencyChips .chip").forEach(x=>x.classList.remove("selected")); el.classList.add("selected"); }
+function selectPrivacy(el){ selectedPrivacy = el.dataset.priv; document.querySelectorAll(".privacy-opt").forEach(x=>x.classList.remove("selected")); el.classList.add("selected"); }
+
+function checkDuplicates(){
+  const q = document.getElementById("f-title").value.trim().toLowerCase();
+  const box = document.getElementById("dupResults");
+  if(q.length<4){ box.innerHTML=""; return; }
+  const matches = ISSUES.filter(i=>i.title.toLowerCase().includes(q.split(" ")[0]) || i.category.toLowerCase()===selectedCategory.toLowerCase()).slice(0,2);
+  if(matches.length===0){ box.innerHTML = '<p class="hint" style="margin-top:10px;">No similar open issues found — this looks new.</p>'; return; }
+  box.innerHTML = matches.map(m=>`
+    <div class="dup-card">
+      <b>${m.title}</b>
+      <span style="color:var(--ink-faint);">${m.support} students supporting · ${STATUS_META[m.status].label}</span>
+      <button class="support-btn" onclick="event.stopPropagation(); supportExisting('${m.id}')">Support this instead</button>
+    </div>`).join("");
+}
+function supportExisting(id){
+  const iss = ISSUES.find(i=>i.id===id);
+  if(iss) iss.support++;
+  showToast(`Added your support to ${id}`);
+}
+
+function submitFeedback(){
+  const title = document.getElementById("f-title").value.trim() || "Untitled report";
+  const dept = document.getElementById("f-dept").value;
+  const desc = document.getElementById("f-desc").value.trim() || "No additional description provided.";
+  counter++;
+  const id = "CV-"+counter;
+  ISSUES.unshift({
+    id, title, category:selectedCategory, dept, status:"submitted", urgency:selectedUrgency, support:1,
+    desc, timeline:[[ "Just now", `Submitted (${selectedPrivacy==='public'?'public':selectedPrivacy==='anon'?'anonymous to students':'confidential'}).`]]
+  });
+  document.getElementById("formStage").style.display="none";
+  document.getElementById("submitConfirm").classList.add("active");
+  document.getElementById("confirmId").textContent = id;
+}
+function resetForm(){
+  document.getElementById("formStage").style.display="block";
+  document.getElementById("submitConfirm").classList.remove("active");
+  document.getElementById("f-title").value=""; document.getElementById("f-desc").value="";
+  document.getElementById("dupResults").innerHTML="";
+}
+
+/* ---------------- Board ---------------- */
+function populateFilters(){
+  const sel = document.getElementById("filterCategory");
+  sel.innerHTML = '<option value="">All categories</option>' + CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join("");
+}
+function renderBoard(){
+  const cat = document.getElementById("filterCategory").value;
+  const st = document.getElementById("filterStatus").value;
+  const txt = document.getElementById("filterText").value.toLowerCase();
+  const list = ISSUES.filter(i=>
+    (!cat || i.category===cat) && (!st || i.status===st) && (!txt || i.title.toLowerCase().includes(txt))
+  );
+  const wrap = document.getElementById("boardList");
+  if(list.length===0){ wrap.innerHTML = '<p style="padding:32px 0; color:var(--ink-faint);">No issues match these filters.</p>'; return; }
+  wrap.innerHTML = list.map(i=>`
+    <div class="issue-row" onclick="openIssue('${i.id}')">
+      <div>
+        <div class="issue-title">${i.title}</div>
+        <div class="issue-meta"><span>${i.category}</span><span>${i.dept}</span><span class="urgency ${i.urgency.includes('Safety')?'high':''}">${i.urgency}</span><span>${i.id}</span></div>
+      </div>
+      <div class="issue-right">
+        <span class="pill ${STATUS_META[i.status].cls}"><span class="dot"></span>${STATUS_META[i.status].label}</span>
+        <span class="support-count">${i.support} supporting</span>
+      </div>
+    </div>`).join("");
+}
+
+/* ---------------- Modal / issue detail ---------------- */
+function openIssue(id){
+  const i = ISSUES.find(x=>x.id===id);
+  if(!i) return;
+  document.getElementById("modalBody").innerHTML = `
+    <h2>${i.title}</h2>
+    <div class="modal-meta">${i.id} · ${i.category} · ${i.dept} · <span class="pill ${STATUS_META[i.status].cls}"><span class="dot"></span>${STATUS_META[i.status].label}</span></div>
+    <p class="modal-desc">${i.desc}</p>
+    <h4 style="font-size:0.95rem; margin-bottom:14px;">Evidence timeline</h4>
+    <ul class="timeline">
+      ${i.timeline.map(t=>`<li><div class="tdot"></div><div><div class="twhen">${t[0]}</div><div class="twhat">${t[1]}</div></div></li>`).join("")}
+    </ul>
+    ${i.status==='verify' ? `
+      <div>
+        <h4 style="font-size:0.9rem; margin-bottom:6px;">Was this actually solved?</h4>
+        <div class="verify-row">
+          <button onclick="verifyIssue('${i.id}','solved')">Solved</button>
+          <button onclick="verifyIssue('${i.id}','partial')">Partially solved</button>
+          <button onclick="verifyIssue('${i.id}','not')">Not solved</button>
+        </div>
+      </div>` : `
+      <div class="verify-row">
+        <button onclick="supportExisting('${i.id}'); openIssue('${i.id}')">Support this issue</button>
+      </div>`}
+  `;
+  document.getElementById("modalBackdrop").classList.add("active");
+}
+function closeModal(){ document.getElementById("modalBackdrop").classList.remove("active"); }
+function verifyIssue(id, result){
+  const i = ISSUES.find(x=>x.id===id);
+  if(result==="solved"){ i.status="closed"; i.timeline.push(["Just now","Verified as solved by students. Closed."]); showToast("Marked as solved — issue closed."); }
+  else if(result==="not"){ i.status="reopen"; i.timeline.push(["Just now","Rejected by students. Reopened and escalated."]); showToast("Reopened — sent back to the department."); }
+  else { i.timeline.push(["Just now","Marked partially solved by a student."]); showToast("Noted as partially solved."); }
+  closeModal();
+  renderBoard();
+  renderHomeRecent();
+}
+
+/* ---------------- Dashboards ---------------- */
+function renderDashboard(){
+  const recurring = [["Projector / AV faults",22],["Water heater outages",15],["Wi-Fi dead zones",13],["Corridor lighting",9],["Elevator downtime",6]];
+  const maxR = Math.max(...recurring.map(r=>r[1]));
+  document.getElementById("dashBars1").innerHTML = recurring.map(([l,n])=>`
+    <div class="bar-row"><div class="bl-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${(n/maxR*100).toFixed(0)}%"></div></div><div class="bl-val">${n}</div></div>`).join("");
+
+  const sat = [["Solved",68],["Partially solved",21],["Not solved",11]];
+  document.getElementById("dashBars2").innerHTML = sat.map(([l,n])=>`
+    <div class="bar-row"><div class="bl-label">${l}</div><div class="bar-track"><div class="bar-fill" style="width:${n}%; background:${l==='Not solved'?'var(--rose)':l==='Partially solved'?'var(--amber)':'var(--teal)'}"></div></div><div class="bl-val">${n}%</div></div>`).join("");
+}
+
+/* ---------------- Transparency ---------------- */
+function renderTransparency(){
+  const items = [
+    {said:"Extend library hours during exam week", did:"Library hours extended to 2 AM for the two weeks before finals, based on 240 student votes."},
+    {said:"Fix Wi-Fi dead zones in the east hostel block", did:"Two new access points installed; signal complaints in that block dropped by 70% this term."},
+    {said:"Explain why the elective clash couldn't be avoided", did:"Examinations published a note citing faculty availability, and committed to a revised scheduling process next term."},
+    {said:"Faster placement cell responses", did:"A 48-hour acknowledgement standard was introduced and has held for eight straight weeks."}
+  ];
+  document.getElementById("saidDidList").innerHTML = items.map(it=>`
+    <div class="said-did"><div class="said">You said — <b>${it.said}</b></div><div class="did">${it.did}</div></div>`).join("");
+}
+
+/* ---------------- Toast ---------------- */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove("show"), 2400);
+}
+
+/* ---------------- Init ---------------- */
+renderHeroChain();
+renderHomeRecent();
+renderHomeBars();
+renderChips();
+populateFilters();
+</script>
+</body>
+</html>
